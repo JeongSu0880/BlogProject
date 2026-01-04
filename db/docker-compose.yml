@@ -7,6 +7,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root12345678
       MYSQL_DATABASE: hanadb
+      MYSQL_USER: hanaro
+      MYSQL_PASSWORD: 12345678
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci

@@ -1,0 +1,90 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+enum FolderType {
+  stack
+  activity
+}
+
+model Comment {
+  id            Int       @id @default(autoincrement()) @db.UnsignedInt
+  post          Int       @db.UnsignedInt
+  writer        Int       @db.UnsignedInt
+  parentComment Int?      @db.UnsignedInt
+  content       String    @db.Text
+  isDeleted     Boolean   @default(false)
+  createdAt     DateTime  @default(now()) @db.Timestamp(0)
+  updatedAt     DateTime  @default(now()) @db.Timestamp(0)
+  Comment       Comment?  @relation("CommentToComment", fields: [parentComment], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_Comment_parent")
+  other_Comment Comment[] @relation("CommentToComment")
+  Post          Post      @relation(fields: [post], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_Comment_post")
+  User          User      @relation(fields: [writer], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_Comment_writer")
+
+  @@index([parentComment], map: "fk_Comment_parent")
+  @@index([post], map: "fk_Comment_post")
+  @@index([writer], map: "fk_Comment_writer")
+}
+
+model Contribution {
+  date  DateTime @id @db.Date
+  count Int      @default(0) @db.UnsignedInt
+}
+
+model Folder {
+  id    Int    @id @default(autoincrement()) @db.UnsignedTinyInt
+  title String @unique(map: "uniq_Folder_title") @db.VarChar(50)
+  type  FolderType @default(stack)
+
+  Post  Post[]
+}
+
+model Post {
+  id        Int        @id @default(autoincrement()) @db.UnsignedInt
+  folder    Int        @db.UnsignedTinyInt
+  title     String     @db.VarChar(255)
+  content   String     @db.Text
+  likes     Int        @default(0) @db.UnsignedMediumInt
+  createdAt DateTime   @default(now()) @db.Timestamp(0)
+  updatedAt DateTime   @default(now()) @db.Timestamp(0)
+  readCnt   Int        @default(0) @db.UnsignedInt
+  Comment   Comment[]
+  Folder    Folder     @relation(fields: [folder], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_Post_folder")
+  PostLike  PostLike[]
+
+  @@index([folder], map: "fk_Post_folder")
+}
+
+model PostLike {
+  user      Int      @db.UnsignedInt
+  post      Int      @db.UnsignedInt
+  createdAt DateTime @default(now()) @db.Timestamp(0)
+  Post      Post     @relation(fields: [post], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_Postlike_post")
+  User      User     @relation(fields: [user], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_Postlike_user")
+
+  @@id([user, post])
+  @@index([post], map: "fk_Postlike_post")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model StopWord {
+  value String? @db.VarChar(31)
+
+  @@ignore
+}
+
+model User {
+  id        Int        @id @default(autoincrement()) @db.UnsignedInt
+  email     String     @unique(map: "uniq_User_email") @db.VarChar(255)
+  nickname  String     @unique(map: "uniq_User_nickname") @db.VarChar(31)
+  passwd    String?    @db.VarChar(255)
+  isAdmin   Boolean    @default(false)
+  expiredAt DateTime?  @db.DateTime(0)
+  Comment   Comment[]
+  PostLike  PostLike[]
+}
