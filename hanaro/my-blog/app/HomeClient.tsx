@@ -9,7 +9,13 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { Folder } from '@/lib/generated/prisma/client';
 
-export default function HomeClient({ folders }: { folders: Folder[] }) {
+export default function HomeClient({
+  folders,
+  stopWords,
+}: {
+  folders: Folder[];
+  stopWords: Set<string>;
+}) {
   const [filterStr, setFilterStr] = useState('');
 
   const filtered = folders.filter((f) =>
@@ -27,8 +33,9 @@ export default function HomeClient({ folders }: { folders: Folder[] }) {
 
         <div className="flex items-center gap-2">
           <Input
-            value={filterStr}
-            onChange={(e) => setFilterStr(e.target.value)}
+            onChange={(e) => {
+              if (!stopWords.has(e.target.value)) setFilterStr(e.target.value);
+            }}
             placeholder="Search folder..."
           />
           <Button size="icon">

@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import type { Folder } from '@/lib/generated/prisma/client';
 import { prisma } from '@/lib/prisma';
+import { loadStopWords } from '@/lib/stopwords';
 import FolderClient from './FolderClient';
 
 type Props = { params: Promise<{ folderId: string }> };
@@ -26,8 +27,11 @@ export default async function FolderPage({ params }: Props) {
       folder: Number(folderId),
     },
   });
-
-  return <FolderClient posts={posts} title={folder.title} />;
+  const stopWordSet = await loadStopWords();
+  return (
+    <FolderClient posts={posts} title={folder.title} stopWords={stopWordSet} />
+  );
 }
 
 //TODO 뒤로가기 누르면 어디로 가야할지
+// TODO 불용어도 여기저기 쓰이는데.. 이거 전역적으로 관리해야하는지

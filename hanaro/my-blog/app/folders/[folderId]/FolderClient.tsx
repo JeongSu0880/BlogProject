@@ -11,9 +11,11 @@ import type { Post } from '@/lib/generated/prisma/client';
 export default function FolderClient({
   posts,
   title,
+  stopWords,
 }: {
   posts: Post[];
   title: string;
+  stopWords: Set<string>;
 }) {
   const [filterStr, setFilterStr] = useState('');
 
@@ -30,8 +32,9 @@ export default function FolderClient({
         {/* TODO 여기에 정렬 순서 설정하는 것도 있으면 좋겠다.. */}
         <div className="flex gap-1">
           <Input
-            value={filterStr}
-            onChange={(e) => setFilterStr(e.target.value)}
+            onChange={(e) => {
+              if (!stopWords.has(e.target.value)) setFilterStr(e.target.value);
+            }}
             placeholder="Search posts..."
           />
           <Button size="icon">
@@ -49,3 +52,4 @@ export default function FolderClient({
     </div>
   );
 }
+// TODO 와 디바운스?? 그것도 써야할까??

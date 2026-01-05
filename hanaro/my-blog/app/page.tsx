@@ -1,9 +1,11 @@
 import ContributionGrass from '@/components/ContributionGrass';
 import type { Folder } from '@/lib/generated/prisma/client';
 import { prisma } from '@/lib/prisma';
+import { loadStopWords } from '@/lib/stopwords';
 import HomeClient from './HomeClient';
 export default async function Home() {
   const folders: Folder[] = await prisma.folder.findMany();
+  const stopWords = await loadStopWords();
   return (
     <div className="px-20">
       <div className="mx-auto max-w-7xl">
@@ -21,7 +23,7 @@ export default async function Home() {
         </div>
       </div>
       <div>
-        <HomeClient folders={folders} />
+        <HomeClient folders={folders} stopWords={stopWords} />
         {/* TODO 여기에 pagination 추가하기 */}
       </div>
     </div>
