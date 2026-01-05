@@ -10,11 +10,6 @@ export default async function Home() {
   const folders: Folder[] = await prisma.folder.findMany();
   return (
     <div className="px-20">
-      <div className="flex h-50 w-full items-center justify-center">
-        <Link href="/">
-          <h1 className="text-3xl">수리공작소</h1>
-        </Link>
-      </div>
       <div>
         <Tabs defaultValue="all">
           <div className="flex items-center justify-between">
@@ -31,21 +26,33 @@ export default async function Home() {
           </div>
           <TabsContent value="all">
             {folders?.map((folder) => {
-              return <FolderCard key={folder.id} {...folder} />;
+              return (
+                <Link key={folder.id} href={`/folders/${folder.id}`}>
+                  <FolderCard {...folder} />
+                </Link>
+              );
             })}
           </TabsContent>
           <TabsContent value="stack">
             {folders
               ?.filter((i) => i.type === 'stack')
               .map((folder) => {
-                return <FolderCard key={folder.id} {...folder} />;
+                return (
+                  <Link key={folder.id} href={`/folders/${folder.id}`}>
+                    <FolderCard {...folder} />
+                  </Link>
+                );
               })}
           </TabsContent>
           <TabsContent value="activity">
             {folders
               ?.filter((i) => i.type === 'activity')
               .map((folder) => {
-                return <FolderCard key={folder.id} {...folder} />;
+                return (
+                  <Link key={folder.id} href={`/folders/${folder.id}`}>
+                    <FolderCard key={folder.id} {...folder} />
+                  </Link>
+                );
               })}
           </TabsContent>
         </Tabs>

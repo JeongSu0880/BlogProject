@@ -40,6 +40,11 @@ export default function RootLayout({
               <ThemeToggle />
             </div>
           </header>
+          <div className="flex h-50 w-full items-center justify-center">
+            <Link href="/">
+              <h1 className="text-3xl">수리공작소</h1>
+            </Link>
+          </div>
           {children}
         </body>
       </SessionProvider>

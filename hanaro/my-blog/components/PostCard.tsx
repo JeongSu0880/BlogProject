@@ -1,5 +1,5 @@
 import { MoveRight } from 'lucide-react';
-import type { Folder } from '@/lib/generated/prisma/client';
+import type { Post } from '@/lib/generated/prisma/client';
 import {
   Card,
   CardAction,
@@ -9,12 +9,14 @@ import {
   CardTitle,
 } from './ui/card';
 
-export default function FolderCard({
+export default function PostCard({
   title,
-  description,
+  content,
+  likes,
   createdAt,
   updatedAt,
-}: Folder) {
+  readCnt,
+}: Post) {
   return (
     <div className="p-1">
       <Card className="transition-transform hover:translate-x-1">
@@ -28,13 +30,15 @@ export default function FolderCard({
               <div className="text-xs">
                 수정일 {new Date(updatedAt).toLocaleDateString('ko-KR')}
               </div>
+              <div className="text-xs">좋아요 {likes}</div>
+              <div className="text-xs">조회수 {readCnt}</div>
             </div>
             <MoveRight />
           </CardDescription>
           <CardAction>{/* 여기에 클릭하면 페이지 이동하도록 */}</CardAction>
         </CardHeader>
         <CardContent>
-          <div className="text-sm">{description}</div>
+          <div className="line-clamp-1 text-gray-400 text-sm">{content}</div>
         </CardContent>
       </Card>
     </div>
