@@ -1,12 +1,42 @@
 import { FolderType } from '@/lib/generated/prisma/client';
 import { prisma } from '@/lib/prisma';
 
+/* =========================
+ * util functions
+ * ========================= */
+
+function generateContributions(start: string, end: string) {
+  const result: { date: Date; count: number }[] = [];
+  const cur = new Date(start);
+  const endDate = new Date(end);
+
+  while (cur <= endDate) {
+    result.push({
+      date: new Date(cur),
+      count: Math.random() < 0.4 ? 0 : Math.floor(Math.random() * 8) + 1,
+    });
+    cur.setDate(cur.getDate() + 1);
+  }
+
+  return result;
+}
+
+function randomReadCnt() {
+  return Math.floor(Math.random() * 500) + 10;
+}
+
+function randomLikes(max: number) {
+  return Math.floor(Math.random() * Math.min(50, max));
+}
+
+/* =========================
+ * main seed (⭐ 여기 안에만 await!)
+ * ========================= */
+
 async function main() {
   console.log('🌱 Start seeding...');
 
-  /**
-   * 1️⃣ User
-   */
+  // 1️⃣ User
   await prisma.user.createMany({
     data: [
       {
@@ -15,22 +45,13 @@ async function main() {
         passwd: 'hashed-password',
         isAdmin: true,
       },
-      {
-        email: 'user1@test.com',
-        nickname: 'user1',
-        passwd: 'hashed-password',
-      },
-      {
-        email: 'user2@test.com',
-        nickname: 'user2',
-        passwd: 'hashed-password',
-      },
+      { email: 'user1@test.com', nickname: 'user1', passwd: 'hashed-password' },
+      { email: 'user2@test.com', nickname: 'user2', passwd: 'hashed-password' },
     ],
+    skipDuplicates: true,
   });
 
-  /**
-   * 2️⃣ Folder (실제 게시판)
-   */
+  // 2️⃣ Folder
   await prisma.folder.createMany({
     data: [
       { title: 'React', description: 'React 관련 글', type: FolderType.stack },
@@ -60,14 +81,13 @@ async function main() {
         type: FolderType.stack,
       },
     ],
+    skipDuplicates: true,
   });
 
   const folders = await prisma.folder.findMany();
   const folderMap = Object.fromEntries(folders.map((f) => [f.title, f.id]));
 
-  /**
-   * 3️⃣ Post (각 folder당 2~3개, 장문 content)
-   */
+  // 3️⃣ Post
   await prisma.post.createMany({
     data: [
       // =========================
@@ -260,7 +280,32 @@ Piscine을 앞두고 있다면
   });
 
   console.log('✅ Posts seeded');
+
+  // 4️⃣ Contribution
+  const contributions = generateContributions('2025-01-01', '2026-12-31');
+  await prisma.contribution.createMany({
+    data: contributions,
+    skipDuplicates: true,
+  });
+  console.log('✅ Contributions seeded');
+
+  // 5️⃣ likes / readCnt
+  const posts = await prisma.post.findMany();
+  for (const post of posts) {
+    const readCnt = randomReadCnt();
+    const likes = randomLikes(readCnt);
+    await prisma.post.update({
+      where: { id: post.id },
+      data: { readCnt, likes },
+    });
+  }
+
+  console.log('✅ Post likes & readCnt updated');
 }
+
+/* =========================
+ * execute
+ * ========================= */
 
 main()
   .catch((e) => {
