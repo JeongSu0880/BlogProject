@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { SessionProvider } from 'next-auth/react';
-import { ModeToggle } from '@/components/ModeToggle';
-import { UserToggle } from '@/components/UserToggle';
+import { ProfileToggle } from '@/components/ProfileToggle';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import './globals.css';
 
 export default function RootLayout({
@@ -31,13 +31,13 @@ export default function RootLayout({
                 <div>
                   {/* <Link href="/mypage">마이페이지</Link> */}
                   {/* <Separator orientation="vertical" /> */}
-                  <UserToggle user={user} />
+                  <ProfileToggle />
                   {/* <Link href="/api/auth/signout">{session.user.name}</Link> */}
                 </div>
               ) : (
                 <Link href="/api/auth/signin">로그인</Link>
               )}
-              <ModeToggle />
+              <ThemeToggle />
             </div>
           </header>
           {children}
@@ -49,3 +49,5 @@ export default function RootLayout({
 // TODO text white 다 빼기
 // TODO 로그인, 로그아웃 커스텀 페이지 만들기
 // TODO 로그인 후 뒤로가기 했을 때의 처리 (redirect 이런거 꼬이지 않게)
+// TODO UserToggle에 진짜 user 넣어주기
+// TODO 커스텀 로그인 로그아웃 구현 (그 훅 구현)

@@ -7,11 +7,6 @@ datasource db {
   provider = "mysql"
 }
 
-enum FolderType {
-  stack
-  activity
-}
-
 model Comment {
   id            Int       @id @default(autoincrement()) @db.UnsignedInt
   post          Int       @db.UnsignedInt
@@ -37,11 +32,13 @@ model Contribution {
 }
 
 model Folder {
-  id    Int    @id @default(autoincrement()) @db.UnsignedTinyInt
-  title String @unique(map: "uniq_Folder_title") @db.VarChar(50)
-  type  FolderType @default(stack)
-
-  Post  Post[]
+  id          Int        @id @default(autoincrement()) @db.UnsignedTinyInt
+  title       String     @unique(map: "uniq_Folder_title") @db.VarChar(50)
+  description String?    @db.VarChar(255)
+  type        FolderType @default(stack)
+  createdAt   DateTime   @default(now()) @db.Timestamp(0)
+  updatedAt   DateTime   @default(now()) @updatedAt @db.Timestamp(0)
+  Post        Post[]
 }
 
 model Post {
@@ -87,4 +84,9 @@ model User {
   expiredAt DateTime?  @db.DateTime(0)
   Comment   Comment[]
   PostLike  PostLike[]
+}
+
+enum FolderType {
+  stack
+  activity
 }

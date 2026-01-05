@@ -1,6 +1,5 @@
 'use client';
 import Link from 'next/link';
-import type { User } from 'next-auth';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,7 +8,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { signOut } from '@/lib/auth';
 
-export function UserToggle({ user }: User) {
+export function ProfileToggle() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
