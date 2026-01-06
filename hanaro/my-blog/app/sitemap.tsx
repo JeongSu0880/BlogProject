@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'sbm.topician.com';
+  const baseUrl = 'http://localhost:3000';
 
   return [
     {

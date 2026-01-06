@@ -40,9 +40,9 @@ async function main() {
   await prisma.user.createMany({
     data: [
       {
-        email: 'adminaa@gmail.com',
-        nickname: '정수',
-        passwd: 'admin',
+        email: 'latsyrc900@gmail.com',
+        nickname: 'Jeongsu',
+        passwd: null,
         isAdmin: true,
       },
       { email: 'user1@test.com', nickname: 'user1', passwd: 'hashed-password' },
@@ -299,6 +299,72 @@ Piscine을 앞두고 있다면
       data: { readCnt, likes },
     });
   }
+
+  // 6️⃣ Comment
+  console.log('🌱 Seeding comments...');
+
+  const users = await prisma.user.findMany();
+  const postsForComments = await prisma.post.findMany();
+
+  const comments: {
+    post: number;
+    writer: number;
+    content: string;
+    parentComment?: number | null;
+  }[] = [];
+
+  // 1️⃣ 부모 댓글 생성
+  for (const post of postsForComments) {
+    const parentCount = Math.floor(Math.random() * 3) + 1; // 1~3개
+
+    for (let i = 0; i < parentCount; i++) {
+      const user = users[Math.floor(Math.random() * users.length)];
+      comments.push({
+        post: post.id,
+        writer: user.id,
+        content: `이 글 정말 도움이 됐어요! 👍 (${post.title})`,
+        parentComment: null,
+      });
+    }
+  }
+
+  // 부모 댓글 먼저 생성
+  await prisma.comment.createMany({
+    data: comments,
+  });
+
+  // 2️⃣ 대댓글 생성
+  const parentComments = await prisma.comment.findMany({
+    where: { parentComment: null },
+  });
+
+  const replies: {
+    post: number;
+    writer: number;
+    content: string;
+    parentComment: number;
+  }[] = [];
+
+  for (const parent of parentComments) {
+    if (Math.random() < 0.5) continue; // 50% 확률로만 대댓글
+
+    const replyCount = Math.floor(Math.random() * 2) + 1; // 1~2개
+    for (let i = 0; i < replyCount; i++) {
+      const user = users[Math.floor(Math.random() * users.length)];
+      replies.push({
+        post: parent.post,
+        writer: user.id,
+        parentComment: parent.id,
+        content: `저도 공감합니다! 🙌`,
+      });
+    }
+  }
+
+  await prisma.comment.createMany({
+    data: replies,
+  });
+
+  console.log('✅ Comments seeded');
 
   console.log('✅ Post likes & readCnt updated');
 }

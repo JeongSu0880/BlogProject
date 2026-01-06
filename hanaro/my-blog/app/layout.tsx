@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { SessionProvider } from 'next-auth/react';
 import { ThemeProvider } from 'next-themes';
@@ -8,6 +9,11 @@ import { Button } from '@/components/ui/button';
 import { auth } from '@/lib/auth';
 import './globals.css';
 
+export const metadata: Metadata = {
+  title: '수리공작소',
+  description: '개발과 기록을 위한 블로그',
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -15,14 +21,6 @@ export default function RootLayout({
 }>) {
   const session = use(auth());
   console.log('🚀 ~ session:', session?.user.isAdmin);
-  // const user = {
-  //   isadmin: true,
-  //   passwd: '12343',
-  //   id: '1',
-  //   name: '정수',
-  //   email: 'sara2501',
-  // };
-  // const session = { user };
 
   return (
     <html lang="ko" suppressHydrationWarning>
@@ -45,7 +43,7 @@ export default function RootLayout({
                     ) : (
                       ''
                     )}
-                    {/* 여기 hydration 에러 어떻게 해결해 진짜 아오 */}
+                    {/* 여기 hydration 에러 어떻게 해결 */}
                     <ProfileToggle />
                   </div>
                 ) : (
