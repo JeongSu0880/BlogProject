@@ -1,8 +1,11 @@
 import { notFound } from 'next/navigation';
+import type { ReactNode } from 'react';
+import { auth } from '@/lib/auth';
 import type { Post } from '@/lib/generated/prisma/client';
 import { prisma } from '@/lib/prisma';
+import CommentsSection from './components/CommentsSection';
 
-type Props = { params: Promise<{ postId: string }> };
+type Props = { params: Promise<{ postId: string }>; children?: ReactNode };
 
 export const generateStaticParams = async () => {
   const posts: Awaited<Post[]> = await prisma.post.findMany();
@@ -11,7 +14,7 @@ export const generateStaticParams = async () => {
   }));
 };
 
-export default async function PostPage({ params }: Props) {
+export default async function PostPage({ params, children }: Props) {
   const { postId } = await params;
 
   const post = await prisma.post.findUnique({
@@ -25,6 +28,24 @@ export default async function PostPage({ params }: Props) {
 
   if (!post) notFound(); //TODO notfound 페이지 만들기
 
+  const session = await auth();
+
+  const rawComments = await prisma.comment.findMany({
+    where: { post: Number(postId) },
+    include: { User: true },
+    orderBy: { createdAt: 'asc' },
+  });
+
+  const comments = rawComments.map((c) => ({
+    id: c.id,
+    content: c.content,
+    writer: c.writer,
+    writerNickname: c.User.nickname,
+    isDeleted: c.isDeleted,
+    createdAt: c.createdAt.toISOString(),
+    updatedAt: c.updatedAt.toISOString(),
+  }));
+
   return (
     <div className="px-20">
       <h5 className="pb-3 text-sm">{post.Folder.title}</h5>
@@ -35,6 +56,15 @@ export default async function PostPage({ params }: Props) {
         </h6>
       </div>
       <div>{post.content}</div>
+
+      <CommentsSection
+        initialComments={comments}
+        postId={post.id}
+        currentUserId={session?.user?.id ? Number(session.user.id) : undefined}
+        isAdmin={session?.user?.isAdmin}
+      />
+
+      {children}
     </div>
   );
 }

@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { Folder, Post, User } from '@/lib/generated/prisma/client';
-import { deletePost } from '@/lib/post.action';
+import { deletePostAction } from './actions/deletePostAction';
 import FolderContent from './FolderContent';
 
 export default function AdminTab({
@@ -85,25 +85,6 @@ export default function AdminTab({
         <TabsContent value="게시판">
           {filteredFolders.map((folder) => (
             <FolderContent key={folder.id} {...folder} />
-            // <div key={folder.id} className="grid grid-cols-14 items-center">
-            //   <div className="col-span-12">
-            //     <Link href={`/folders/${folder.id}`}>
-            //       <FolderCard {...folder} />
-            //     </Link>
-            //   </div>
-            //   <form>
-            //     <div className="justity-center col-span-1 flex text-gray-500">
-            //       <Button formAction={() => updateFolder({ id: folder.id })}>
-            //         <Pen />
-            //       </Button>
-            //     </div>
-            //     <div className="justity-center col-span-1 text-gray-500">
-            //       <Button formAction={() => deleteFolder(folder.id)}>
-            //         <X />
-            //       </Button>
-            //     </div>
-            //   </form>
-            // </div>
           ))}
         </TabsContent>
 
@@ -115,7 +96,7 @@ export default function AdminTab({
                   <PostCard {...post} />
                 </Link>
               </div>
-              <form>
+              <div>
                 <div className="justity-center col-span-1 flex text-gray-500">
                   <Link href={`/admin/posts/${post.id}/edit`}>
                     <Button>
@@ -124,11 +105,20 @@ export default function AdminTab({
                   </Link>
                 </div>
                 <div className="justity-center col-span-1 text-gray-500">
-                  <Button formAction={() => deletePost(post.id)}>
-                    <X />
-                  </Button>
+                  <form action={deletePostAction}>
+                    <input type="hidden" name="id" value={post.id} />
+                    <Button
+                      type="submit"
+                      onClick={(e) => {
+                        if (!confirm('정말 삭제하시겠습니까?'))
+                          e.preventDefault();
+                      }}
+                    >
+                      <X />
+                    </Button>
+                  </form>
                 </div>
-              </form>
+              </div>
             </div>
           ))}
         </TabsContent>

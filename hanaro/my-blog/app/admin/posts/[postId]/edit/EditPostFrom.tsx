@@ -51,7 +51,6 @@ export default function EditPostForm({ post }: { post: Post }) {
 
       <div>
         <Label className="mb-1 block text-sm">내용</Label>
-        {/* eslint-disable-next-line */}
         <textarea
           ref={textareaRef}
           value={content}
@@ -60,7 +59,7 @@ export default function EditPostForm({ post }: { post: Post }) {
             if (textareaRef.current) {
               textareaRef.current.style.height = 'auto';
               const newHeight = textareaRef.current.scrollHeight;
-              const MAX = 600; // px
+              const MAX = 600;
               textareaRef.current.style.height = `${Math.min(newHeight, MAX)}px`;
             }
           }}
