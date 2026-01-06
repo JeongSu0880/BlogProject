@@ -4,6 +4,7 @@ import { ThemeProvider } from 'next-themes';
 import { use } from 'react';
 import { ProfileToggle } from '@/components/ProfileToggle';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { Button } from '@/components/ui/button';
 import { auth } from '@/lib/auth';
 import './globals.css';
 
@@ -37,6 +38,13 @@ export default function RootLayout({
               <div className="flex items-center justify-end gap-2 pt-3 pr-5">
                 {session?.user ? (
                   <div>
+                    {session.user.isAdmin === true ? (
+                      <Link href="/admin">
+                        <Button>관리자</Button>
+                      </Link>
+                    ) : (
+                      ''
+                    )}
                     {/* 여기 hydration 에러 어떻게 해결해 진짜 아오 */}
                     <ProfileToggle />
                   </div>

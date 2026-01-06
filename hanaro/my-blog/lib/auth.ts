@@ -78,12 +78,11 @@ export const {
         token.id = user.id;
         token.email = user.email;
         token.name = user.name;
-        token.isadmin = user.isAdmin;
+        token.isAdmin = user.isAdmin;
       }
       return token;
     },
     async session({ session, token }) {
-      console.log(token);
       if (token) {
         session.user.id = token.id as string;
         session.user.email = token.email as string;
