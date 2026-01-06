@@ -40,7 +40,8 @@ export const loginEmail = async (formData: FormData) => {
     console.log('🚀 ~ err:', err, err instanceof AuthError);
     if (err instanceof AuthError) {
       const msg = err.message || 'EmailSignInError';
-      const email = msg.substring(0, msg.indexOf('Read more'));
+      // const email = msg.substring(0, msg.indexOf('Read more'));
+      const email = msg;
       return [{ error: { email }, data }];
     }
     return [{ error: { email: JSON.stringify(err) }, data }];
@@ -56,7 +57,7 @@ export const regist = async (
 ): Promise<ValidError | undefined> => {
   const zobj = z
     .object({
-      nickname: z.string().min(1, 'Input the nickname!').max(30),
+      nickname: z.string().min(1, '닉네임을 입력해주세요.').max(30),
       email: z.email(),
       passwd: z.string().min(3),
       passwd2: z.string().min(3),
@@ -79,7 +80,7 @@ export const regist = async (
 
     if (user)
       return {
-        error: { email: 'This email is already exists!' },
+        error: { email: '이미 존재하는 이메일입니다.' },
         data,
       } satisfies ValidError;
 
@@ -88,11 +89,12 @@ export const regist = async (
       select: { id: true, nickname: true, email: true, isAdmin: true },
     });
 
-    redirect('/sign');
+    // On success, return undefined so the client (RegisterForm) can decide to close the modal
+    return undefined;
   } catch (err) {
     let message = JSON.stringify(err);
     if (isErrorWithMessage(err)) {
-      if (err.message === 'NEXT_REDIRECT') redirect('/sign');
+
       message = err.message;
     }
     return {

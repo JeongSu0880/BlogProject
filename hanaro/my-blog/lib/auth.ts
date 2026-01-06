@@ -67,7 +67,7 @@ export const {
 
       user.id = String(oldUser.id);
       user.name = oldUser.nickname;
-      user.isadmin = oldUser.isAdmin;
+      user.isAdmin = oldUser.isAdmin;
 
       return true;
     },
@@ -79,7 +79,7 @@ export const {
         token.id = user.id;
         token.email = user.email;
         token.name = user.name;
-        token.isadmin = user.isadmin;
+        token.isadmin = user.isAdmin;
       }
       return token;
     },
@@ -88,7 +88,7 @@ export const {
         session.user.id = user.id;
         session.user.email = user.email;
         session.user.name = user.name;
-        session.user.isadmin = user.isadmin;
+        session.user.isAdmin = user.isAdmin;
       }
       return session;
     },
