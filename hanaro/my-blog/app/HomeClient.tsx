@@ -24,15 +24,16 @@ export default function HomeClient({
 
   return (
     <div>
-      <div>게시판 검색</div>
       <Tabs defaultValue="all">
         <div className="flex items-center justify-between">
-          <TabsList>
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="stack">Stack</TabsTrigger>
-            <TabsTrigger value="activity">Activity</TabsTrigger>
-          </TabsList>
-
+          <div className="flex items-center gap-3 pl-4">
+            <div>게시판 검색📚</div>
+            <TabsList>
+              <TabsTrigger value="all">All</TabsTrigger>
+              <TabsTrigger value="stack">Stack</TabsTrigger>
+              <TabsTrigger value="activity">Activity</TabsTrigger>
+            </TabsList>
+          </div>
           <div className="flex items-center gap-2">
             <Input
               onChange={(e) => {

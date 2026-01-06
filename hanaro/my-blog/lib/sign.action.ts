@@ -1,4 +1,12 @@
+'use server';
+import { redirect } from 'next/navigation';
+import { AuthError } from 'next-auth';
 import { signOut } from 'next-auth/react';
+import z from 'zod';
+import { signIn } from './auth';
+import { isErrorWithMessage } from './error';
+import { prisma } from './prisma';
+import { encryptPassword, type ValidError, validate } from './validator';
 
 export type Provider = 'google' | 'github' | 'credentials';
 
@@ -6,98 +14,93 @@ export const logout = async () => {
   await signOut({ redirectTo: '/' });
 };
 
-// const login = async (provider: Provider, formData: FormData) => {
-//   const redirectTo = formData.get('redirectTo') as string;
-//   await signIn(provider, { redirectTo });
-// };
+const login = async (provider: Provider, formData: FormData) => {
+  const redirectTo = formData.get('redirectTo') as string;
+  await signIn(provider, { redirectTo });
+};
 
-// export const loginEmail = async (formData: FormData) => {
-//   const zobj = z.object({
-//     email: z.email('Invalid Email Address!'),
-//     passwd: z.string().min(3, 'Password is more than 3 characters!'),
-//   });
+export const loginGithub = async (formData: FormData) =>
+  login('github', formData);
 
-//   const [err, data] = validate(zobj, formData);
-//   if (err) return [err];
+export const loginEmail = async (formData: FormData) => {
+  const zobj = z.object({
+    email: z.email('유효하지 않은 이메일입니다.'),
+    passwd: z.string().min(3, '비밀번호를 3자리 이상 입력해주세요.'),
+  });
 
-//   try {
-//     const ret = await signIn('credentials', { redirect: false, ...data });
-//     console.log('🚀 ~ signIn.return:', ret);
+  const [err, data] = validate(zobj, formData);
+  if (err) return [err];
 
-//     return [undefined, data];
-//   } catch (err) {
-//     console.log('🚀 ~ err:', err, err instanceof AuthError);
-//     if (err instanceof AuthError) {
-//       const msg = err.message || 'EmailSignInError';
-//       const email = msg.substring(0, msg.indexOf('Read more'));
-//       return [{ error: { email }, data }];
-//     }
-//     return [{ error: { email: JSON.stringify(err) }, data }];
-//   }
-// };
+  try {
+    const ret = await signIn('credentials', { redirect: false, ...data });
+    console.log('🚀 ~ signIn.return:', ret);
+
+    return [undefined, data];
+  } catch (err) {
+    console.log('🚀 ~ err:', err, err instanceof AuthError);
+    if (err instanceof AuthError) {
+      const msg = err.message || 'EmailSignInError';
+      const email = msg.substring(0, msg.indexOf('Read more'));
+      return [{ error: { email }, data }];
+    }
+    return [{ error: { email: JSON.stringify(err) }, data }];
+  }
+};
 
 // export const loginGoogle = async (formData: FormData) =>
 //   login('google', formData);
 
-// export const loginGithub = async (formData: FormData) =>
-//   login('github', formData);
+export const regist = async (
+  _: ValidError | undefined,
+  formData: FormData,
+): Promise<ValidError | undefined> => {
+  const zobj = z
+    .object({
+      nickname: z.string().min(1, 'Input the nickname!').max(30),
+      email: z.email(),
+      passwd: z.string().min(3),
+      passwd2: z.string().min(3),
+    })
+    .refine(({ passwd, passwd2 }) => passwd === passwd2, {
+      path: ['passwd2'],
+      message: '입력하신 비밀번호가 일치하지 않습니다.',
+    });
 
-// export const regist = async (
-//   _: ValidError | undefined,
-//   formData: FormData,
-// ): Promise<ValidError | undefined> => {
-//   const imageFile = await saveProfile(formData.get('image') as File);
-//   console.log('🚀 ~ imageFile:', imageFile);
-//   formData.set('image', imageFile || '');
+  const [err, data] = validate(zobj, formData);
+  console.log('🚀 ~ err:', err, data);
+  if (err) return err;
 
-//   const zobj = z
-//     .object({
-//       name: z.string().min(1, 'Input the name!').max(30),
-//       email: z.email(),
-//       passwd: z.string().min(3),
-//       passwd2: z.string().min(3),
-//       image: z.nullable(z.string()),
-//     })
-//     .refine(({ passwd, passwd2 }) => passwd === passwd2, {
-//       path: ['passwd2'],
-//       message: 'Not equals the passwd and passwd2!',
-//     });
+  const { email, nickname } = data;
+  try {
+    const passwd = await encryptPassword(data.passwd);
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
 
-//   const [err, data] = validate(zobj, formData);
-//   console.log('🚀 ~ err:', err, data);
-//   if (err) return err;
+    if (user)
+      return {
+        error: { email: 'This email is already exists!' },
+        data,
+      } satisfies ValidError;
 
-//   const { email, name, image } = data;
-//   try {
-//     const passwd = await encryptPassword(data.passwd);
-//     const user = await prisma.user.findUnique({
-//       where: { email },
-//     });
+    await prisma.user.create({
+      data: { email, nickname, passwd },
+      select: { id: true, nickname: true, email: true, isAdmin: true },
+    });
 
-//     if (user)
-//       return {
-//         error: { email: 'This email is already exists!' },
-//         data,
-//       } satisfies ValidError;
-
-//     await prisma.user.create({
-//       data: { email, name, passwd, image },
-//       select: { id: true, name: true, email: true, isadmin: true },
-//     });
-
-//     redirect('/sign');
-//   } catch (err) {
-//     let message = JSON.stringify(err);
-//     if (isErrorWithMessage(err)) {
-//       if (err.message === 'NEXT_REDIRECT') redirect('/sign');
-//       message = err.message;
-//     }
-//     return {
-//       error: { email: message },
-//       data,
-//     };
-//   }
-// };
+    redirect('/sign');
+  } catch (err) {
+    let message = JSON.stringify(err);
+    if (isErrorWithMessage(err)) {
+      if (err.message === 'NEXT_REDIRECT') redirect('/sign');
+      message = err.message;
+    }
+    return {
+      error: { email: message },
+      data,
+    };
+  }
+};
 
 // export const changePassword = async (formData: FormData) => {
 //   const session = await auth();

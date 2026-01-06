@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { logout } from '@/lib/auth.action';
+import { logout } from '@/lib/sign.action';
 import { Button } from './ui/button';
 
 export function ProfileToggle() {

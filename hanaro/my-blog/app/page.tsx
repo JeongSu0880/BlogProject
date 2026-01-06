@@ -10,7 +10,6 @@ export default async function Home() {
   return (
     <div className="px-20">
       <div>
-        {/* TODO 일단 나중에 stat 추가 */}
         <div className="grid grid-cols-4 gap-6 pb-3">
           <div className="col-span-3">
             <ContributionGrass />
@@ -19,9 +18,6 @@ export default async function Home() {
             <BlogStat />
           </div>
         </div>
-        {/* <div className="pb-3">
-          <ContributionGrass />
-        </div> */}
       </div>
       <div>
         <HomeClient folders={folders} stopWords={stopWords} />

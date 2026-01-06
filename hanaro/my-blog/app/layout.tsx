@@ -1,7 +1,10 @@
 import Link from 'next/link';
 import { SessionProvider } from 'next-auth/react';
+import { ThemeProvider } from 'next-themes';
+import { use } from 'react';
 import { ProfileToggle } from '@/components/ProfileToggle';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { auth } from '@/lib/auth';
 import './globals.css';
 
 export default function RootLayout({
@@ -9,41 +12,51 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // const session = use(auth());
-  // console.log('🚀 ~ session:', session?.user);
-  const user = {
-    isadmin: true,
-    passwd: '12343',
-    id: '1',
-    name: '정수',
-    email: 'sara2501',
-  };
-  const session = { user };
+  const session = use(auth());
+  console.log('🚀 ~ session:', session?.user);
+  // const user = {
+  //   isadmin: true,
+  //   passwd: '12343',
+  //   id: '1',
+  //   name: '정수',
+  //   email: 'sara2501',
+  // };
+  // const session = { user };
 
   return (
-    <html lang="ko">
-      <SessionProvider>
-        <body>
-          <header>
-            <div className="flex items-center justify-end gap-2 pt-3 pr-5">
-              {session?.user ? (
-                <div>
-                  <ProfileToggle />
-                </div>
-              ) : (
-                <Link href="/api/auth/signin">로그인</Link>
-              )}
-              <ThemeToggle />
+    <html lang="ko" suppressHydrationWarning>
+      <body>
+        <SessionProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <header>
+              <div className="flex items-center justify-end gap-2 pt-3 pr-5">
+                {session?.user ? (
+                  <div>
+                    {/* <Suspense> */}
+                    <ProfileToggle />
+                    {/* </Suspense> */}
+                  </div>
+                ) : (
+                  // <Link href="/api/auth/signin">로그인</Link>
+                  <Link href="/sign">로그인</Link>
+                )}
+                <ThemeToggle />
+              </div>
+            </header>
+            <div className="flex h-50 w-full items-center justify-center">
+              <Link href="/">
+                <h1 className="text-3xl">수리공작소</h1>
+              </Link>
             </div>
-          </header>
-          <div className="flex h-50 w-full items-center justify-center">
-            <Link href="/">
-              <h1 className="text-3xl">수리공작소</h1>
-            </Link>
-          </div>
-          {children}
-        </body>
-      </SessionProvider>
+            {children}
+          </ThemeProvider>
+        </SessionProvider>
+      </body>
     </html>
   );
 }

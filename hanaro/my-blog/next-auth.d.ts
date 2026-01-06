@@ -7,18 +7,21 @@ export type X = JWT;
 declare module 'next-auth' {
   interface Session {
     user: {
-      isadmin?: boolean;
+      isAdmin?: boolean;
+      nickname: string;
     } & DefaultSession['user'];
   }
 
   interface User {
     passwd?: string;
-    isadmin?: boolean;
+    isAdmin?: boolean;
+    nickname: string;
   }
 }
 
 declare module 'next-auth/jwt' {
   interface JWT {
-    isadmin?: boolean;
+    isAdmin?: boolean;
+    nickname: string;
   }
 }
