@@ -1,3 +1,4 @@
+import BlogStat from '@/components/BlogStat';
 import ContributionGrass from '@/components/ContributionGrass';
 import type { Folder } from '@/lib/generated/prisma/client';
 import { prisma } from '@/lib/prisma';
@@ -8,19 +9,19 @@ export default async function Home() {
   const stopWords = await loadStopWords();
   return (
     <div className="px-20">
-      <div className="mx-auto max-w-7xl">
-        {/* TODO 일단 나중에 stat 추가
-        <div className="grid grid-cols-4 justify-between gap-6 pb-3">
+      <div>
+        {/* TODO 일단 나중에 stat 추가 */}
+        <div className="grid grid-cols-4 gap-6 pb-3">
           <div className="col-span-3">
             <ContributionGrass />
           </div>
           <div className="col-span-1">
             <BlogStat />
           </div>
-        </div> */}
-        <div className="pb-3">
-          <ContributionGrass />
         </div>
+        {/* <div className="pb-3">
+          <ContributionGrass />
+        </div> */}
       </div>
       <div>
         <HomeClient folders={folders} stopWords={stopWords} />

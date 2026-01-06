@@ -1,11 +1,7 @@
-import { prisma } from '@/lib/prisma';
+import { getContributionDate } from '@/lib/date';
+import ContributionSquare from './ContributionSquare';
 import { ScrollArea, ScrollBar } from './ui/scroll-area';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from './ui/tooltip';
+import { TooltipProvider } from './ui/tooltip';
 
 export const contributionColorMap: Record<number, string> = {
   0: 'bg-transparent',
@@ -18,8 +14,7 @@ export const contributionColorMap: Record<number, string> = {
 };
 
 export default async function ContributionGrass() {
-  const contributions = await prisma.contribution.findMany();
-
+  const contributions = await getContributionDate();
   const getContributionLevel = (count: number) => {
     if (count === 0) return 0;
     return Math.min(6, Math.floor((count - 1) / 3) + 1);
@@ -33,24 +28,11 @@ export default async function ContributionGrass() {
             const level = getContributionLevel(con.count);
 
             return (
-              <Tooltip key={con.date.getTime()}>
-                <TooltipTrigger asChild>
-                  <div
-                    className={`h-4 w-4 rounded border border-gray-100 ${contributionColorMap[level]}`}
-                  />
-                </TooltipTrigger>
-
-                <TooltipContent side="top">
-                  <div className="text-xs">
-                    <div className="font-medium">
-                      {con.date.toLocaleDateString('ko-KR')}
-                    </div>
-                    <div className="text-muted-foreground">
-                      {con.count} contributions
-                    </div>
-                  </div>
-                </TooltipContent>
-              </Tooltip>
+              <ContributionSquare
+                key={con.dateString}
+                con={con}
+                className={`h-4 w-4 rounded border border-gray-100 ${contributionColorMap[level]}`}
+              />
             );
           })}
         </div>

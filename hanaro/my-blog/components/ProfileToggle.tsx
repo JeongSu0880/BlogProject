@@ -1,4 +1,5 @@
 'use client';
+import { UserRound } from 'lucide-react';
 import Link from 'next/link';
 import {
   DropdownMenu,
@@ -6,24 +7,24 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { signOut } from '@/lib/auth';
+import { logout } from '@/lib/auth.action';
+import { Button } from './ui/button';
 
 export function ProfileToggle() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="font-medium">
-          {/*여기에 유저 이름이 쓰여야 하는데 나 nickname으로 했는디,, */}
-          TestUser
-        </button>
+        <Button variant="outline" size="icon">
+          <UserRound />
+        </Button>
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end">
         <DropdownMenuItem asChild>
-          <Link href="/mypage">My Page</Link>
+          <Link href="/mypage">My page</Link>
         </DropdownMenuItem>
 
-        <DropdownMenuItem onClick={() => signOut()}>Sign out</DropdownMenuItem>
+        <DropdownMenuItem onClick={logout}>Sign out</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
