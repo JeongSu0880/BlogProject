@@ -89,13 +89,23 @@ export default function AdminTab({
         </TabsContent>
 
         <TabsContent value="포스팅">
+          <div className="mb-4 flex items-center justify-end">
+            <Link href="/admin/posts/new">
+              <Button>
+                <Pen className="mr-2 h-4 w-4" />
+                게시글 추가
+              </Button>
+            </Link>
+          </div>
+
           {filteredPosts.map((post) => (
             <div key={post.id} className="grid grid-cols-14 items-center">
               <div className="col-span-12">
-                <Link key={post.id} href={`/posts/${post.id}`}>
+                <Link href={`/posts/${post.id}`}>
                   <PostCard {...post} />
                 </Link>
               </div>
+
               <div>
                 <div className="justity-center col-span-1 flex text-gray-500">
                   <Link href={`/admin/posts/${post.id}/edit`}>
@@ -104,14 +114,16 @@ export default function AdminTab({
                     </Button>
                   </Link>
                 </div>
+
                 <div className="justity-center col-span-1 text-gray-500">
                   <form action={deletePostAction}>
                     <input type="hidden" name="id" value={post.id} />
                     <Button
                       type="submit"
                       onClick={(e) => {
-                        if (!confirm('정말 삭제하시겠습니까?'))
+                        if (!confirm('정말 삭제하시겠습니까?')) {
                           e.preventDefault();
+                        }
                       }}
                     >
                       <X />
