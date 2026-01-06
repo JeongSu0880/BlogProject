@@ -1,5 +1,5 @@
 'use server';
-import { redirect } from 'next/navigation';
+
 import { AuthError } from 'next-auth';
 import { signOut } from 'next-auth/react';
 import z from 'zod';
@@ -8,11 +8,11 @@ import { isErrorWithMessage } from './error';
 import { prisma } from './prisma';
 import { encryptPassword, type ValidError, validate } from './validator';
 
-export type Provider = 'google' | 'github' | 'credentials';
+export type Provider = 'github' | 'credentials';
 
-export const logout = async () => {
-  await signOut({ redirectTo: '/' });
-};
+// export const logout = async () => {
+//   await signOut({ redirectTo: '/' });
+// };
 
 const login = async (provider: Provider, formData: FormData) => {
   const redirectTo = formData.get('redirectTo') as string;
@@ -40,16 +40,13 @@ export const loginEmail = async (formData: FormData) => {
     console.log('🚀 ~ err:', err, err instanceof AuthError);
     if (err instanceof AuthError) {
       const msg = err.message || 'EmailSignInError';
-      // const email = msg.substring(0, msg.indexOf('Read more'));
-      const email = msg;
+      const email = msg.substring(0, msg.indexOf('Read more'));
+      // const email = msg;
       return [{ error: { email }, data }];
     }
     return [{ error: { email: JSON.stringify(err) }, data }];
   }
 };
-
-// export const loginGoogle = async (formData: FormData) =>
-//   login('google', formData);
 
 export const regist = async (
   _: ValidError | undefined,
@@ -89,7 +86,6 @@ export const regist = async (
       select: { id: true, nickname: true, email: true, isAdmin: true },
     });
 
-    // On success, return undefined so the client (RegisterForm) can decide to close the modal
     return undefined;
   } catch (err) {
     let message = JSON.stringify(err);

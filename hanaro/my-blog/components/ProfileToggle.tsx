@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { logout } from '@/lib/sign.action';
+import { signOut } from 'next-auth/react';
 import { Button } from './ui/button';
 
 export function ProfileToggle() {
@@ -24,7 +24,9 @@ export function ProfileToggle() {
           <Link href="/mypage">My page</Link>
         </DropdownMenuItem>
 
-        <DropdownMenuItem onClick={logout}>Sign out</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => signOut({ callbackUrl: '/' })}>
+          Sign out
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

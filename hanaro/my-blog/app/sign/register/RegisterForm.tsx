@@ -11,16 +11,13 @@ export default function RegisterForm() {
   const [validError, makeRegist, isPending] = useActionState(regist, undefined);
   const router = useRouter();
 
-  // Controlled form state so we can preserve values after server validation errors
   const [email, setEmail] = useState('');
   const [nickname, setNickname] = useState('');
   const [passwd, setPasswd] = useState('');
   const [passwd2, setPasswd2] = useState('');
 
-  // Track that we've submitted so we can detect completion and react to success/failure
   const submittedRef = useRef(false);
 
-  // When server returns validation errors, prefill the form with returned data
   useEffect(() => {
     if (validError?.data) {
       setEmail(validError.data.email || '');
@@ -30,7 +27,6 @@ export default function RegisterForm() {
     }
   }, [validError]);
 
-  // Detect success: after a submission (submittedRef), when isPending goes false and no validError
   useEffect(() => {
     if (isPending) {
       submittedRef.current = true;
@@ -39,10 +35,8 @@ export default function RegisterForm() {
 
     if (!isPending && submittedRef.current) {
       if (!validError) {
-        // Success -> close modal by navigating back (the Modal uses router.back())
         router.back();
       }
-      // reset submission tracker so we only react to the most recent submit
       submittedRef.current = false;
     }
   }, [isPending, validError, router]);
@@ -50,7 +44,6 @@ export default function RegisterForm() {
   return (
     <div className="grid place-items-center">
       <form action={makeRegist} className="w-full space-y-3">
-        {/* Show a top-level server message if present */}
         {validError?.error?.email && (
           <div className="text-center text-red-600">{validError.error.email}</div>
         )}

@@ -12,7 +12,7 @@ import type { ValidError } from '@/lib/validator';
 export default function SignForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get('callbackUrl') || '/hello';
+  const redirectTo = searchParams.get('callbackUrl') || '/';
 
   //   const defaultError =
   //     process.env.NODE_ENV === 'development'
