@@ -82,12 +82,13 @@ export const {
       }
       return token;
     },
-    async session({ session, user }) {
-      if (user) {
-        session.user.id = user.id;
-        session.user.email = user.email;
-        session.user.name = user.name;
-        session.user.isAdmin = user.isAdmin;
+    async session({ session, token }) {
+      console.log(token);
+      if (token) {
+        session.user.id = token.id as string;
+        session.user.email = token.email as string;
+        session.user.name = token.name;
+        session.user.isAdmin = token.isAdmin;
       }
       return session;
     },

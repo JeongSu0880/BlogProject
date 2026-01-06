@@ -23,3 +23,5 @@ export function GithubLoginButton({ formAction }: Props) {
     </Button>
   );
 }
+//TODO 와 라우터 정리
+// 로그인되어있는 상태 (session에 누가 있는 상태)이면 로그인 페이지 갈 수 없다.

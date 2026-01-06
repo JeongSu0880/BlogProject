@@ -13,7 +13,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const session = use(auth());
-  console.log('🚀 ~ session:', session?.user);
+  console.log('🚀 ~ session:', session);
   // const user = {
   //   isadmin: true,
   //   passwd: '12343',
@@ -26,7 +26,7 @@ export default function RootLayout({
   return (
     <html lang="ko" suppressHydrationWarning>
       <body>
-        <SessionProvider>
+        <SessionProvider session={session}>
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
@@ -37,9 +37,8 @@ export default function RootLayout({
               <div className="flex items-center justify-end gap-2 pt-3 pr-5">
                 {session?.user ? (
                   <div>
-                    {/* <Suspense> */}
+                    {/* 여기 hydration 에러 어떻게 해결해 진짜 아오 */}
                     <ProfileToggle />
-                    {/* </Suspense> */}
                   </div>
                 ) : (
                   // <Link href="/api/auth/signin">로그인</Link>

@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { getContributionDate } from '@/lib/date';
 import ContributionSquare from './ContributionSquare';
 import { ScrollArea, ScrollBar } from './ui/scroll-area';
@@ -20,25 +21,27 @@ export default async function ContributionGrass() {
     return Math.min(6, Math.floor((count - 1) / 3) + 1);
   };
   return (
-    <ScrollArea className="whitespace-nowrap rounded-md border">
-      <h3 className="p-4 pb-1">나의 잔디🌱</h3>
-      <TooltipProvider>
-        <div className="grid w-max grid-flow-col grid-rows-7 gap-1 p-4 pt-0">
-          {contributions.map((con) => {
-            const level = getContributionLevel(con.count);
+    <Suspense fallback={null}>
+      <ScrollArea className="whitespace-nowrap rounded-md border">
+        <h3 className="p-4 pb-1">나의 잔디🌱</h3>
+        <TooltipProvider>
+          <div className="grid w-max grid-flow-col grid-rows-7 gap-1 p-4 pt-0">
+            {contributions.map((con) => {
+              const level = getContributionLevel(con.count);
 
-            return (
-              <ContributionSquare
-                key={con.dateString}
-                con={con}
-                className={`h-4 w-4 rounded border border-gray-100 ${contributionColorMap[level]}`}
-              />
-            );
-          })}
-        </div>
-      </TooltipProvider>
-      <ScrollBar orientation="horizontal" />
-    </ScrollArea>
+              return (
+                <ContributionSquare
+                  key={con.dateString}
+                  con={con}
+                  className={`h-4 w-4 rounded border border-gray-100 ${contributionColorMap[level]}`}
+                />
+              );
+            })}
+          </div>
+        </TooltipProvider>
+        <ScrollBar orientation="horizontal" />
+      </ScrollArea>
+    </Suspense>
   );
   //   return (
   //     <ScrollArea className="whitespace-nowrap rounded-md border">
