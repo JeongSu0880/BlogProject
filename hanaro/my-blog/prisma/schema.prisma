@@ -35,7 +35,7 @@ model Folder {
   id          Int        @id @default(autoincrement()) @db.UnsignedTinyInt
   title       String     @unique(map: "uniq_Folder_title") @db.VarChar(50)
   description String?    @db.VarChar(255)
-  type        FolderType @default(stack)
+  type        FolderType @default(none)
   createdAt   DateTime   @default(now()) @db.Timestamp(0)
   updatedAt   DateTime   @default(now()) @updatedAt @db.Timestamp(0)
   Post        Post[]
@@ -89,4 +89,5 @@ model User {
 enum FolderType {
   stack
   activity
+  none
 }

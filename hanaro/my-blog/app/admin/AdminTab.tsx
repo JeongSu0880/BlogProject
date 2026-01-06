@@ -1,5 +1,5 @@
 'use client';
-import { Search } from 'lucide-react';
+import { Pen, Search, X } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import FolderCard from '@/components/FolderCard';
@@ -61,28 +61,71 @@ export default function AdminTab({
 
         <TabsContent value="사용자">
           {filteredUsers.map((user) => (
-            <UserCard
-              key={user.id}
-              email={user.email}
-              nickname={user.nickname}
-              expiredAt={user.expiredAt}
-            />
+            <div key={user.id} className="grid grid-cols-10 items-center">
+              <div className="col-span-10">
+                <UserCard
+                  email={user.email}
+                  nickname={user.nickname}
+                  expiredAt={user.expiredAt}
+                />
+              </div>
+              {/* <div className="col-span-9">
+                <UserCard
+                  email={user.email}
+                  nickname={user.nickname}
+                  expiredAt={user.expiredAt}
+                />
+              </div>
+              <div className="col-span-1">{user.expiredAt && <X />}</div> */}
+            </div>
           ))}
         </TabsContent>
 
         <TabsContent value="게시판">
           {filteredFolders.map((folder) => (
-            <Link key={folder.id} href={`/folders/${folder.id}`}>
-              <FolderCard {...folder} />
-            </Link>
+            <div key={folder.id} className="grid grid-cols-14 items-center">
+              <div className="col-span-12">
+                <Link href={`/folders/${folder.id}`}>
+                  <FolderCard {...folder} />
+                </Link>
+              </div>
+              <form>
+                <div className="justity-center col-span-1 flex text-gray-500">
+                  <Button formAction={updateFolder}>
+                    <Pen />
+                  </Button>
+                </div>
+                <div className="justity-center col-span-1 text-gray-500">
+                  <Button formAction={deleteFolder}>
+                    <X />
+                  </Button>
+                </div>
+              </form>
+            </div>
           ))}
         </TabsContent>
 
         <TabsContent value="포스팅">
           {filteredPosts.map((post) => (
-            <Link key={post.id} href={`/posts/${post.id}`}>
-              <PostCard {...post} />
-            </Link>
+            <div key={post.id} className="grid grid-cols-14 items-center">
+              <div className="col-span-12">
+                <Link key={post.id} href={`/posts/${post.id}`}>
+                  <PostCard {...post} />
+                </Link>
+              </div>
+              <form>
+                <div className="justity-center col-span-1 flex text-gray-500">
+                  <Button formAction={updatePost}>
+                    <Pen />
+                  </Button>
+                </div>
+                <div className="justity-center col-span-1 text-gray-500">
+                  <Button formAction={deletePost}>
+                    <X />
+                  </Button>
+                </div>
+              </form>
+            </div>
           ))}
         </TabsContent>
       </Tabs>
