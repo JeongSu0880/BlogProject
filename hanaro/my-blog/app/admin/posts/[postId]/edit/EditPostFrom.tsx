@@ -4,12 +4,23 @@ import { useRouter } from 'next/navigation';
 import { startTransition, useEffect, useRef, useState } from 'react';
 
 import { Label } from '@/components/ui/label';
-import type { Post } from '@/lib/generated/prisma/client';
-import { updatePost } from '@/lib/post.action';
+import type { Folder, Post } from '@/lib/generated/prisma/client';
+import { createPost, updatePost } from '@/lib/post.action';
 
-export default function EditPostForm({ post }: { post: Post }) {
-  const [title, setTitle] = useState(post.title);
-  const [content, setContent] = useState(post.content);
+type EditPostFormProps = {
+  post?: Post | null;
+  folders: Folder[];
+};
+
+export default function EditPostForm({ post, folders }: EditPostFormProps) {
+  const [title, setTitle] = useState(post?.title ?? '');
+  const [content, setContent] = useState(post?.content ?? '');
+  const [folderTitle, setFolderTitle] = useState(
+    folders.find((f) => f.id === post?.folder)?.title ??
+      folders[0]?.title ??
+      '',
+  );
+
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -17,7 +28,7 @@ export default function EditPostForm({ post }: { post: Post }) {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
       const newHeight = textareaRef.current.scrollHeight;
-      const MAX = 600; // px
+      const MAX = 600;
       textareaRef.current.style.height = `${Math.min(newHeight, MAX)}px`;
     }
   }, []);
@@ -28,7 +39,21 @@ export default function EditPostForm({ post }: { post: Post }) {
     startTransition(async () => {
       setIsSaving(true);
       try {
-        await updatePost({ id: post.id, title, content });
+        if (post?.id) {
+          await updatePost({
+            id: post.id,
+            folderTitle,
+            title,
+            content,
+          });
+        } else {
+          await createPost({
+            title,
+            content,
+            folderTitle,
+          });
+        }
+
         router.push('/admin');
       } catch (err) {
         console.error('save failed', err);
@@ -40,6 +65,21 @@ export default function EditPostForm({ post }: { post: Post }) {
 
   return (
     <div className="space-y-4">
+      <div>
+        <Label className="mb-1 block text-sm">폴더</Label>
+        <select
+          value={folderTitle}
+          onChange={(e) => setFolderTitle(e.target.value)}
+          className="w-full rounded border px-3 py-2"
+        >
+          {folders.map((folder) => (
+            <option key={folder.id} value={folder.title}>
+              {folder.title}
+            </option>
+          ))}
+        </select>
+      </div>
+
       <div>
         <Label className="mb-1 block text-sm">제목</Label>
         <input

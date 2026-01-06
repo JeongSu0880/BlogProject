@@ -28,7 +28,7 @@ export default function SignForm() {
   const [validError, login, isPending] = useActionState(
     async (_: ValidError | undefined, formData: FormData) => {
       const [err, data] = await loginEmail(formData);
-      console.log('🚀 ~ err:', err, data);
+      // console.log('🚀 ~ err:', err, data);
       if (err) {
         return err as ValidError;
       }

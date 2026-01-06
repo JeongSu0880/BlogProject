@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { auth } from '@/lib/auth';
 import type { Post } from '@/lib/generated/prisma/client';
 import { prisma } from '@/lib/prisma';
-import CommentsSection from './components/CommentsSection';
+import CommentsSection from '../../../components/CommentsSection';
 
 type Props = { params: Promise<{ postId: string }>; children?: ReactNode };
 

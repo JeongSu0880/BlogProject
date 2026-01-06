@@ -12,7 +12,13 @@ export const deletePost = async (id: number) => {
   });
 };
 
-export const updatePost = async ({ id, ...post }: IdRequired<Post>) => {
+export const updatePost = async ({
+  id,
+  folderTitle,
+  ...post
+}: IdRequired<Post> & {
+  folderTitle?: string;
+}) => {
   const data = Object.fromEntries(
     Object.entries(post).filter(([, v]) => v !== undefined),
   );
@@ -31,18 +37,18 @@ export const updatePost = async ({ id, ...post }: IdRequired<Post>) => {
 };
 
 export const createPost = async (input: {
-  folderId: number;
+  folderTitle: string;
   title: string;
   content: string;
 }) => {
-  const { folderId, title, content } = input;
+  const { folderTitle, title, content } = input;
 
   await prisma.post.create({
     data: {
       title,
       content,
       Folder: {
-        connect: { id: folderId },
+        connect: { title: folderTitle },
       },
     },
   });

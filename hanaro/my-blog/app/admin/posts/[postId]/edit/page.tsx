@@ -19,12 +19,14 @@ export default async function PostEditPage({
     where: { id: Number(postId) },
   });
 
+  const folders = await prisma.folder.findMany({});
+
   if (!post) notFound();
 
   return (
     <div className="px-20 py-10">
       <h1 className="mb-6 font-bold text-xl">게시글 수정</h1>
-      <EditPostForm post={post} />
+      <EditPostForm post={post} folders={folders} />
     </div>
   );
 }

@@ -14,7 +14,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const session = use(auth());
-  console.log('🚀 ~ session:', session);
+  console.log('🚀 ~ session:', session?.user.isAdmin);
   // const user = {
   //   isadmin: true,
   //   passwd: '12343',
