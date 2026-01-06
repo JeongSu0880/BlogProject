@@ -1,4 +1,4 @@
-import BlogStat from '@/components/BlogStat';
+import BlogStat from '@/app/BlogStat';
 import ContributionGrass from '@/components/ContributionGrass';
 import type { Folder } from '@/lib/generated/prisma/client';
 import { prisma } from '@/lib/prisma';
