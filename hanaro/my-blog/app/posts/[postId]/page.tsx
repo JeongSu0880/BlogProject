@@ -4,6 +4,7 @@ import { auth } from '@/lib/auth';
 import type { Post } from '@/lib/generated/prisma/client';
 import { prisma } from '@/lib/prisma';
 import CommentsSection from '../../../components/CommentsSection';
+import LikeButton from '../../../components/LikeButton';
 
 type Props = { params: Promise<{ postId: string }>; children?: ReactNode };
 
@@ -23,12 +24,18 @@ export default async function PostPage({ params, children }: Props) {
     },
     include: {
       Folder: true,
+      PostLike: true,
     },
   });
 
   if (!post) notFound(); //TODO notfound 페이지 만들기
 
   const session = await auth();
+
+  const likeCount = post.PostLike?.length ?? 0;
+  const initialLiked = session?.user?.id
+    ? Boolean(post.PostLike?.some((pl) => pl.user === Number(session.user.id)))
+    : false;
 
   const rawComments = await prisma.comment.findMany({
     where: { post: Number(postId) },
@@ -55,7 +62,18 @@ export default async function PostPage({ params, children }: Props) {
           작성일 {new Date(post.createdAt).toLocaleDateString('ko-KR')}
         </h6>
       </div>
+
       <div>{post.content}</div>
+      <div className="mt-2">
+        <LikeButton
+          postId={post.id}
+          initialCount={likeCount}
+          initialLiked={initialLiked}
+          currentUserId={
+            session?.user?.id ? Number(session.user.id) : undefined
+          }
+        />
+      </div>
 
       <CommentsSection
         initialComments={comments}

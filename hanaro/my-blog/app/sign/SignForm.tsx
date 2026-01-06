@@ -14,21 +14,10 @@ export default function SignForm() {
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get('callbackUrl') || '/';
 
-  //   const defaultError =
-  //     process.env.NODE_ENV === 'development'
-  //       ? {
-  //           error: {},
-  //           data: {
-  //             email: 'sico@gmail.com',
-  //             passwd: '1212',
-  //           },
-  //         }
-  //       : undefined;
-
   const [validError, login, isPending] = useActionState(
     async (_: ValidError | undefined, formData: FormData) => {
       const [err, data] = await loginEmail(formData);
-      // console.log('🚀 ~ err:', err, data);
+      console.log('🚀 ~ err:', err, data);
       if (err) {
         return err as ValidError;
       }

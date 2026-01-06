@@ -100,14 +100,14 @@ export default function AdminTab({
 
           {filteredPosts.map((post) => (
             <div key={post.id} className="grid grid-cols-14 items-center">
-              <div className="col-span-12">
+              <div className="col-span-13">
                 <Link href={`/posts/${post.id}`}>
                   <PostCard {...post} />
                 </Link>
               </div>
 
               <div>
-                <div className="justity-center col-span-1 flex text-gray-500">
+                <div className="justity-center flex text-gray-500">
                   <Link href={`/admin/posts/${post.id}/edit`}>
                     <Button>
                       <Pen />
@@ -115,7 +115,7 @@ export default function AdminTab({
                   </Link>
                 </div>
 
-                <div className="justity-center col-span-1 text-gray-500">
+                <div className="justity-center text-gray-500">
                   <form action={deletePostAction}>
                     <input type="hidden" name="id" value={post.id} />
                     <Button
