@@ -4,13 +4,16 @@ import type { IdRequired } from './folder.action';
 import type { Post } from './generated/prisma/client';
 import { prisma } from './prisma';
 
-export const deletePost = async (id: number) => {
+export async function deletePost(formData: FormData) {
+  const id = Number(formData.get('id'));
+  if (!id) throw new Error('Invalid id');
+
   await prisma.post.delete({
     where: {
       id: id,
     },
   });
-};
+}
 
 export const updatePost = async ({
   id,

@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { Folder, Post, User } from '@/lib/generated/prisma/client';
-import { deletePostAction } from './actions/deletePostAction';
+import { deletePost } from '@/lib/post.action';
 import FolderContent from './FolderContent';
 
 export default function AdminTab({
@@ -116,7 +116,7 @@ export default function AdminTab({
                 </div>
 
                 <div className="justity-center text-gray-500">
-                  <form action={deletePostAction}>
+                  <form action={deletePost}>
                     <input type="hidden" name="id" value={post.id} />
                     <Button
                       type="submit"
