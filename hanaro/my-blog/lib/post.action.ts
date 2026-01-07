@@ -1,5 +1,6 @@
 'use server';
 
+import { redirect } from 'next/navigation';
 import type { IdRequired } from './folder.action';
 import type { Post } from './generated/prisma/client';
 import { prisma } from './prisma';
@@ -13,6 +14,7 @@ export async function deletePost(formData: FormData) {
       id: id,
     },
   });
+  redirect('/admin');
 }
 
 export const updatePost = async ({
