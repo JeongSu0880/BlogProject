@@ -50,8 +50,8 @@ export default async function PostPage({ params, children }: Props) {
     writer: c.writer,
     writerNickname: c.User.nickname,
     isDeleted: c.isDeleted,
-    createdAt: c.createdAt.toISOString(),
-    updatedAt: c.updatedAt.toISOString(),
+    createdAt: c.createdAt.toLocaleDateString('ko-KR'),
+    updatedAt: c.updatedAt.toLocaleDateString('ko-KR'),
   }));
 
   return (

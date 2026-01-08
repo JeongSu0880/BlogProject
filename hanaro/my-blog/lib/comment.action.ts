@@ -1,4 +1,5 @@
 'use server';
+import type { CommentDTO } from '@/components/CommentsSection';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
@@ -96,5 +97,194 @@ export async function editComment(formData: FormData) {
   } catch (err) {
     console.error('editCommentAction error:', err);
     throw err;
+  }
+}
+
+export type CommentState = {
+  editingId: number | null;
+  content: string;
+  comments: CommentDTO[];
+  error?: string;
+};
+
+/* ======================
+   helper
+====================== */
+
+async function fetchComments(postId: number): Promise<CommentDTO[]> {
+  const rows = await prisma.comment.findMany({
+    where: { post: postId },
+    include: { User: true },
+    orderBy: { createdAt: 'asc' },
+  });
+
+  return rows.map((c) => ({
+    id: c.id,
+    content: c.isDeleted ? '삭제된 댓글입니다.' : c.content,
+    writer: c.writer,
+    parentComment: c.parentComment,
+    writerNickname: c.User.nickname,
+    isDeleted: c.isDeleted,
+    createdAt: c.createdAt.toLocaleString('ko-KR', {
+      timeZone: 'Asia/Seoul',
+    }),
+  }));
+}
+
+/* ======================
+   main action
+====================== */
+
+export async function commentAction(
+  prev: CommentState,
+  formData: FormData,
+): Promise<CommentState> {
+  const intent = formData.get('intent');
+  const session = await auth();
+
+  const userId = session?.user?.id ? Number(session.user.id) : null;
+
+  const isAdmin = !!session?.user?.isAdmin;
+
+  try {
+    switch (intent) {
+      /* ======================
+         CREATE
+      ====================== */
+      case 'create': {
+        if (!userId) {
+          return { ...prev, error: '로그인이 필요합니다.' };
+        }
+
+        const postId = Number(formData.get('postId'));
+        const content = String(formData.get('content') || '').trim();
+        const parentComment = formData.get('parentComment');
+
+        if (!content) {
+          return { ...prev, error: '댓글 내용을 입력하세요.' };
+        }
+
+        await prisma.comment.create({
+          data: {
+            post: postId,
+            writer: userId,
+            content,
+            parentComment: parentComment ? Number(parentComment) : null,
+          },
+        });
+
+        return {
+          editingId: null,
+          content: '',
+          comments: await fetchComments(postId),
+        };
+      }
+
+      /* ======================
+         START EDIT
+      ====================== */
+      case 'startEdit': {
+        const commentId = Number(formData.get('commentId'));
+        return {
+          ...prev,
+          editingId: commentId,
+        };
+      }
+
+      /* ======================
+         CANCEL EDIT
+      ====================== */
+      case 'cancelEdit': {
+        return {
+          ...prev,
+          editingId: null,
+        };
+      }
+
+      /* ======================
+         EDIT
+      ====================== */
+      case 'edit': {
+        if (!userId) {
+          return { ...prev, error: '로그인이 필요합니다.' };
+        }
+
+        const commentId = Number(formData.get('commentId'));
+        const content = String(formData.get('content') || '').trim();
+
+        if (!content) {
+          return { ...prev, error: '내용을 입력하세요.' };
+        }
+
+        const comment = await prisma.comment.findUnique({
+          where: { id: commentId },
+        });
+
+        if (!comment) {
+          return { ...prev, error: '댓글이 존재하지 않습니다.' };
+        }
+
+        if (comment.writer !== userId) {
+          return { ...prev, error: '수정 권한이 없습니다.' };
+        }
+
+        await prisma.comment.update({
+          where: { id: commentId },
+          data: { content },
+        });
+
+        return {
+          editingId: null,
+          content: '',
+          comments: await fetchComments(comment.post),
+        };
+      }
+
+      /* ======================
+         DELETE (soft)
+      ====================== */
+      case 'delete': {
+        if (!userId) {
+          return { ...prev, error: '로그인이 필요합니다.' };
+        }
+
+        const commentId = Number(formData.get('commentId'));
+
+        const comment = await prisma.comment.findUnique({
+          where: { id: commentId },
+        });
+
+        if (!comment) {
+          return { ...prev, error: '댓글이 존재하지 않습니다.' };
+        }
+
+        if (comment.writer !== userId && !isAdmin) {
+          return { ...prev, error: '삭제 권한이 없습니다.' };
+        }
+
+        await prisma.comment.update({
+          where: { id: commentId },
+          data: {
+            isDeleted: true,
+            content: '',
+          },
+        });
+
+        return {
+          editingId: null,
+          content: '',
+          comments: await fetchComments(comment.post),
+        };
+      }
+
+      default:
+        return prev;
+    }
+  } catch (e) {
+    console.error(e);
+    return {
+      ...prev,
+      error: '처리 중 오류가 발생했습니다.',
+    };
   }
 }

@@ -59,39 +59,6 @@ export const createPost = async (input: {
   });
 };
 
-export const togglePostLike = async (formData: FormData) => {
-  const postId = Number(formData.get('postId'));
-  const { auth } = await import('./auth');
-  const session = await auth();
-  if (!session?.user?.id) throw new Error('Unauthorized');
-  try {
-    const userId = Number(session.user.id);
-
-    const existing = await prisma.postLike.findFirst({
-      where: { user: userId, post: postId },
-    });
-
-    let liked = false;
-    if (existing) {
-      // remove like
-      await prisma.postLike.deleteMany({
-        where: { user: userId, post: postId },
-      });
-      liked = false;
-    } else {
-      await prisma.postLike.create({ data: { user: userId, post: postId } });
-      liked = true;
-    }
-
-    const count = await prisma.postLike.count({ where: { post: postId } });
-
-    return { liked, count } as const;
-  } catch (err) {
-    console.error('togglePostLike error:', err);
-    throw err;
-  }
-};
-
 export const likePost = async (
   prevState: { like: boolean; message: string },
   formData: FormData,

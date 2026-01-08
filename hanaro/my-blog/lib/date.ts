@@ -13,7 +13,7 @@ export async function getContributionDate(): Promise<ContributionSquareType[]> {
   // Server Component
   const contributions = rows.map((c) => ({
     ...c,
-    dateString: c.date.toISOString().slice(0, 10),
+    dateString: c.date.toLocaleDateString().slice(0, 10),
   }));
 
   return contributions;
