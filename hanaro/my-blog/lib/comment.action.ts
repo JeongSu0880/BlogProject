@@ -2,7 +2,7 @@
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
-export async function createCommentAction(formData: FormData) {
+export async function createComment(formData: FormData) {
   const postId = Number(formData.get('postId'));
   const content = String(formData.get('content') || '').trim();
   const parentId = formData.get('parentId')
@@ -43,12 +43,13 @@ export async function createCommentAction(formData: FormData) {
   }
 }
 
-export async function deleteCommentAction(formData: FormData) {
+export async function deleteComment(formData: FormData) {
   const id = Number(formData.get('id'));
 
   const session = await auth();
   if (!session?.user?.id) throw new Error('Unauthorized');
 
+  console.log('id :: ', id);
   const comment = await prisma.comment.findUnique({ where: { id } });
   if (!comment) throw new Error('Comment not found');
 
@@ -57,7 +58,6 @@ export async function deleteCommentAction(formData: FormData) {
     throw new Error('권한이 없습니다.');
   }
 
-  // soft delete: mark isDeleted and replace content
   try {
     await prisma.comment.update({
       where: { id },
@@ -73,7 +73,7 @@ export async function deleteCommentAction(formData: FormData) {
   }
 }
 
-export async function editCommentAction(formData: FormData) {
+export async function editComment(formData: FormData) {
   const id = Number(formData.get('id'));
   const content = String(formData.get('content') || '').trim();
 

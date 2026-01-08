@@ -1,9 +1,9 @@
 'use client';
 
 import {
-  createCommentAction,
-  deleteCommentAction,
-  editCommentAction,
+  createComment,
+  deleteComment,
+  editComment,
 } from '@/lib/comment.action';
 /* eslint-disable */
 
@@ -55,7 +55,7 @@ export default function CommentsSection({
     if (parentId) form.set('parentId', String(parentId));
 
     try {
-      await createCommentAction(form);
+      await createComment(form);
       // optimistic update
       setComments([
         ...comments,
@@ -97,7 +97,7 @@ export default function CommentsSection({
     form.set('id', String(id));
     form.set('content', editContent);
     try {
-      await editCommentAction(form);
+      await editComment(form);
       setEditing(null);
       setEditContent('');
       router.refresh();
@@ -112,7 +112,7 @@ export default function CommentsSection({
     const form = new FormData();
     form.set('id', String(id));
     try {
-      await deleteCommentAction(form);
+      await deleteComment(form);
       // reflect soft delete locally
       setComments((s) =>
         s.map((c) =>

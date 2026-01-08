@@ -91,3 +91,68 @@ export const togglePostLike = async (formData: FormData) => {
     throw err;
   }
 };
+
+export const likePost = async (
+  prevState: { like: boolean; message: string },
+  formData: FormData,
+) => {
+  const postId = Number(formData.get('postId'));
+  const userId = Number(formData.get('userId'));
+  if (!postId || !userId) {
+    return {
+      ...prevState,
+      message: '잘못된 요청',
+    };
+  }
+
+  const existed = await prisma.postLike.findUnique({
+    where: {
+      user_post: {
+        user: userId,
+        post: postId,
+      },
+    },
+  });
+
+  if (existed) {
+    const [, post] = await prisma.$transaction([
+      prisma.postLike.delete({
+        where: {
+          user_post: {
+            user: userId,
+            post: postId,
+          },
+        },
+      }),
+      prisma.post.update({
+        where: { id: postId },
+        data: { likes: { decrement: 1 } },
+        select: { likes: true },
+      }),
+    ]);
+
+    return {
+      like: false,
+      message: `좋아요 ${post.likes}`,
+    };
+  } else {
+    const [, post] = await prisma.$transaction([
+      prisma.postLike.create({
+        data: {
+          user: userId,
+          post: postId,
+        },
+      }),
+      prisma.post.update({
+        where: { id: postId },
+        data: { likes: { increment: 1 } },
+        select: { likes: true },
+      }),
+    ]);
+
+    return {
+      like: true,
+      message: `좋아요 ${post.likes}`,
+    };
+  }
+};
