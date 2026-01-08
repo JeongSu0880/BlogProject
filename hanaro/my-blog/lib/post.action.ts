@@ -98,11 +98,11 @@ export const likePost = async (
 ) => {
   const postId = Number(formData.get('postId'));
   const userId = Number(formData.get('userId'));
-  if (!postId || !userId) {
-    return {
-      ...prevState,
-      message: '잘못된 요청',
-    };
+
+  console.log(postId, userId);
+
+  if (!userId || !postId) {
+    return prevState;
   }
 
   const existed = await prisma.postLike.findUnique({

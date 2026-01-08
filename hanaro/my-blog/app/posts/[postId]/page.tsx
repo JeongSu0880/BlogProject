@@ -31,7 +31,8 @@ export default async function PostPage({ params, children }: Props) {
   if (!post) notFound(); //TODO notfound 페이지 만들기
 
   const session = await auth();
-
+  console.log('PostLike:', post.PostLike);
+  console.log('session user id:', session?.user?.id);
   const likeCount = post.PostLike?.length ?? 0;
   const initialLiked = session?.user?.id
     ? Boolean(post.PostLike?.some((pl) => pl.user === Number(session.user.id)))

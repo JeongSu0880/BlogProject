@@ -290,13 +290,39 @@ Piscine을 앞두고 있다면
   console.log('✅ Contributions seeded');
 
   // 5️⃣ likes / readCnt
+  // 🔥 PostLike + likes / readCnt 세팅
   const posts = await prisma.post.findMany();
+
   for (const post of posts) {
     const readCnt = randomReadCnt();
-    const likes = randomLikes(readCnt);
+
+    // 좋아요 수는 조회수보다 작게
+    const likeCount = randomLikes(readCnt);
+
+    const users = await prisma.user.findMany();
+    // 랜덤 유저 뽑기 (중복 제거)
+    const shuffledUsers = users
+      .sort(() => 0.5 - Math.random())
+      .slice(0, likeCount);
+
+    // 1️⃣ PostLike 생성
+    if (shuffledUsers.length > 0) {
+      await prisma.postLike.createMany({
+        data: shuffledUsers.map((u) => ({
+          user: u.id,
+          post: post.id,
+        })),
+        skipDuplicates: true, // 🔥 중요
+      });
+    }
+
+    // 2️⃣ Post 카운트 업데이트
     await prisma.post.update({
       where: { id: post.id },
-      data: { readCnt, likes },
+      data: {
+        readCnt,
+        likes: shuffledUsers.length,
+      },
     });
   }
 
